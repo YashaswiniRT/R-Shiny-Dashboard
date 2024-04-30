@@ -1,0 +1,268 @@
+---
+title: "Technical Description of Web App"
+author: "<p>Yashaswini Reddy T</p>"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+
+output:
+  html_document:
+    theme: flatly
+    highlight: pygments
+    #css: styles.css
+    number_sections: false
+    fig_caption: true
+    toc: true
+    toc_float: true
+    
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE)
+```
+
+# Content 
+
+1. Brief Introduction
+2. Data Sources
+3. Technologies Used
+4. Data Transformation
+    + Main Libraries
+    + Streaming Sites Data set
+    + Visualizations Part 1
+    + Visualizations Part 2
+5. Shiny Application
+6. Deployment
+7. References
+
+
+## 1. Brief Introduction
+
+>This dashboard is built in R Shiny and used R Markdown to publish on this website. 
+This is the documentation of web application that describes technical details of how the application was built, how was data cleaned and organized to load for the visualizations of this dashboard.
+
+
+##### **How to see information on the website:**
+
+<img src="www/howto.gif" width="100%"/>
+
+
+## 2. Data Sources
+
+The data sets used in this web app are collected from kaggle [1]. Streaming sites have gained so much popularity in the last decade. With covid pandemic scaring the world and confining humans to indoors, streaming sites witnessed more number of visits in the last couple of years. In this web app, we are using details from Netflix and Disney Plus to review.
+
+Kaggle is considered one of the best dataset providers.Kaggle is the biggest platform for data scientists and machine learning practitioners, and therefore gives aspirants the best practical exposure to the complex world of data science. Most experts, nevertheless, have great praise for the Kaggle community for the way it helps in the upskilling of a data scientist.
+
+The **main components** of the analysis are:
+
+* Platform - Netflix/Disney
+* Type - Movie/Show
+
+
+## 3. Technologies Used
+
+<img src="www/technology.jpg" width="100%"/>
+
+
+## 4. Data Preparation
+
+Now we will work on **Netflix and Disney datasets**.
+
+Steps of data Preparation:
+
+* Loading Data sets
+* Dealing with missing
+* Creating new data frames as required
+* Data manipulations for visualization
+
+### Main Libraries 
+
+```{r error = F, warning = F, message = F}
+library(DT)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(reshape2)
+library(reshape)
+library(purrr)
+library(knitr)
+library(kableExtra)
+library(ggthemes)
+library(plotly)
+library(wordcloud)
+library(wordcloud2)
+library(tm)
+library(stopwords)
+```
+
+### Streaming sites dataset
+
+First, we import the netflix dataset.
+
+```{r}
+netflix<- read.csv("netflix_titles.csv", na.strings = c(""))
+tail(netflix)[2:5]
+
+```
+
+Check the dimension of the dataframe.
+
+```{r}
+dim(netflix)
+```
+
+Netx, we import the disney dataset.
+
+```{r}
+disney<- read.csv("disney_plus_titles.csv", na.strings = c(""))
+tail(disney)[2:5]
+
+```
+
+Check the dimension of the dataframe.
+
+```{r}
+dim(disney)
+```
+
+```{r echo=FALSE,error=FALSE,warning=FALSE,include=FALSE,message=FALSE}
+netflix$platform= c("Netflix")
+disney$platform= c("Disney")
+Streaming_data= rbind(netflix,disney)
+```
+
+### Visualizations Part 1
+
+Let's see sample data for year 2021 based on Duration and Genre of the movies or show.
+
+```{r}
+sample_data = Streaming_data %>%
+      filter(release_year == "2021") %>%
+      group_by(rating) %>%
+      select(title,release_year,type,rating,listed_in)
+kable(sample_data[20:25,],
+      col.names = c("Title","Release Year","Type","Rating","Genre")
+      )%>% kable_styling(c("striped", "hover"), full_width = T)
+```
+
+Let's see full table of Streaming sites Data set for the sites netflix and disney by Type, Title, Country, Release Year, Rating and Genre(s) in 2021. 
+
+
+```{r}
+
+    Streaming_data %>%
+      filter(release_year == "2021") %>% 
+      select(2,3,6,8,9,11) %>% 
+      datatable(., rownames = FALSE, class = "table",
+        options = list(pageLength = 5, scrollX = T),
+        colnames = c("Type","Title","Country","Release Year","Rating","Genres")
+        )
+
+```
+
+Let us now find the ratio of missing and not missing data.
+
+```{r}
+# Missing Disney+ Data
+Missing_Amount <- c()
+Missing_Percentage <- c()
+missing.value.percent <-data.frame(Missing_Amount, Missing_Percentage)
+
+percentage <- apply(Streaming_data, 2, function(col)sum(is.na(col))*100/length(col))
+sum <- apply(Streaming_data, 2, function(col)sum(is.na(col)))
+new <- data.frame(Missing_Amount = sum,
+                  Missing_Percentage = percentage)
+missing.value.percent <- rbind(missing.value.percent, new) 
+missing.value.percent[order(-missing.value.percent$Missing_Percentage),]
+
+```
+
+We will now use pie plot to visualize the data missing and not missing.
+
+```{r}
+# Overall Missing Disney+ Data
+missing.Streaming_data<- sum(is.na(Streaming_data))/prod(dim(Streaming_data))*100
+
+Type <- c("Missing", "Not Missing")
+Percent <- c(missing.Streaming_data, (100 - missing.Streaming_data))
+Streaming_data_missing <- data.frame(Type, Percent)
+
+D_miss_plot <- ggplot(Streaming_data_missing, aes(x="", y=Percent, fill=Type)) +
+        geom_bar(width = 1, stat = "identity") +
+        labs(x = NULL, y = NULL) +
+        ggtitle("Percentage of Streaming Data Missing") +
+        theme(axis.text = element_blank(),
+              legend.title = element_blank(),
+              plot.title = element_text(size = 22, hjust = 0.5),
+              axis.ticks = element_blank(),
+              legend.text = element_text(size = 18),
+              panel.background = element_blank()) + 
+        coord_polar("y", start=0) +
+        geom_text(aes(label = paste0(formatC(Percent,digits = 1, format = "f"), "%")), 
+                  position = position_stack(vjust=0.5), size = 7) + 
+        scale_fill_brewer(palette ="Blues")
+D_miss_plot
+```
+
+
+We will know visual the time series for movies
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+plot_ly_Try <- Streaming_data %>% 
+  filter(release_year<"2021" & release_year>="2000") %>% 
+  group_by(release_year,type) %>% 
+  summarise(counts=n()) %>% 
+  ungroup()
+
+fig_1 <- plot_ly(plot_ly_Try,x=~release_year,y=~counts,type = 'scatter', mode = 'lines',color=~type)
+fig_1
+```
+
+### Visualizations Part 2
+
+```{r}
+
+Streaming_data %>% 
+  group_by(rating) %>% 
+  summarise(countt=n()) %>% 
+  plot_ly(labels=~rating,
+          values=~countt,
+          type='pie')
+
+```
+
+## 5. Shiny Application
+
+Front page of Shiny Application:
+
+<img src="www/front.png" width="100%"/>
+
+<img src="www/front2.png" width="100%"/>
+
+<img src="www/front3.png" width="100%"/>
+
+<img src="www/front4.png" width="100%"/>
+
+<img src="www/front5.png" width="100%"/>
+
+## 6. Deployment
+
+The application is deployed on https://www.shinyapps.io/ web server in 'yashaswinirt' account.
+
+
+## 7. References
+
+[1]. https://www.kaggle.com/datasets/shivamb/netflix-shows?datasetId=434238
+
+[2]. https://github.com/LashaGoch/R-Shiny-App-Graduate-Employment-Singapore
+
+[3]. https://www.kaggle.com/code/rohithkannan17/netflix-basic-eda-r-comprehensive#based-on-genre
+
+[4]. https://www.kaggle.com/code/mykytazharov/eda-of-a-netflix-dataset-with-plotly-in-r
+
+[5]. https://www.kaggle.com/code/kharismabima/netflix-data-exploration/notebook
+
+[6]. https://www.kaggle.com/code/bsbernstein/netflix-analysis-and-visualization
+
+[7]. https://www.kaggle.com/code/vishwad/netflix-vs-disney-basic-eda

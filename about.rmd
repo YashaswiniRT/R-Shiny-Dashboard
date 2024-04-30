@@ -1,0 +1,48 @@
+---
+title: <font size="6"> About Project</font> 
+author: 
+output:
+  html_document:
+    theme: flatly
+    highlight: pygments
+    number_sections: false
+    self_contained: true
+    lib_dir: libs
+    fig_caption: true
+    toc: false
+    toc_float: false
+
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE)
+```
+
+
+Streaming entertainment caught the world by storm, just like VCRs and DVRs did when they were first introduced. Streaming platforms like Netflix, Disney plus, Amazon prime, HBO Max have become a part of parcel of every human's life. They boost up the economy as well. 
+
+For years, streaming sites have been known for innovation and early-entry into different segments of the entertainment and media industry.Netflix has been a front runner in the streaming industry for years, but their success has attracted new competitors to join the streaming industry. Disney+ is a new entrant that has taken the streaming industry by storm.
+
+The media and entertainment industry is made up of several different components. The five main components are film, television, video games, music and publishing. All the streaming services fall into  film and television sectors of this industry.
+
+To become successful in both entertainment and streaming industry, there are several key factors including creativity, technology and consumer demands.
+
+When considering consumer demands, satisfying customers becomes more difficult in the media and entertainment industry. While all industries rely on the demands of their consumers, the media and entertainment industry is much more unique and complex.The M&E industry has many different factors that affect a consumer’s wants and demands. Culture and language expectations vary worldwide. Customers are also unique in what type of genre satisfies their psychological, emotional and inspirational desires.
+
+The threat of substitution as of right now is pretty low for the streaming industry. Streaming has taken over the media and entertainment industry, almost wiping out television programming entirely for teens and young adults. The younger generation is more keen to streaming than traditional television, therefore TV programming isn’t much of an option for a substitute. Another substitute for streaming services could be YouTube, where users can watch free content posted by other users. While YouTube is extremely successful, it does not appear to be a substitute for streaming in general due to the lack of professional content.
+
+With the streaming services becoming more mandatory and new competitors raising, it is important to find new opportunities to stand out. 
+
+One answer to find new opportunities is through technology and improve the business. This can be done through review the so far details and understanding the patterns of customer's preferences.
+
+The motivation to build this dashboard is to visualize the patterns.
+
+This is a project work in "Data Analysis with R" created by T Yashaswini Reddy. Instructors - James D. A. Parker and Albert Crane. 
+
+## The Code of Project 
+
+The code is written in R using Shiny. The documentation of web application and
+the website that you visited just now is published with R Markdown for better flexibility. 
+
+**Full code** is freely available at: 
+[Github](https://github.com/LashaGoch/R-Shiny-App-Graduate-Employment-Singapore)
